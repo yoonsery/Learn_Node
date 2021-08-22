@@ -1,6 +1,6 @@
 2 챕터는 완강 후 다시 들어보기
 
-## 노드란 무엇인고 어떻게 공부?
+## 노드란 무엇이고 어떻게 공부?
 
 95년 JS도입. 브라우저에 자바스크립트 엔진을 도입
 
@@ -68,19 +68,55 @@ Backend & Server | Front-end | Scripting & Automation
 JavaScript는 동기적인 프로그래밍 언어, single thread 인데 어떻게 high performance?  
 ⟶ Non-Blocking I/O, Event-Driven 이 두가지 특징때문에!
 
-### Non-Blocking I/O
+### - Non-Blocking I/O
 
 `I/O` : input / output  
 컴퓨터 내에서 하드웨어(`files | database | network`)적으로 읽고 쓰는 행동들을 I/O라고 함
 
-**I/O vs CPU**
-CPU: Central Processing Unit (두뇌), 계산하고 연산
+**I/O vs CPU**  
+CPU: Central Processing Unit (두뇌), 계산하고 연산  
 I/O: 직접 쓰고 읽기
 
-Blocking : synchronous, 동기적인  
+`Blocking` : synchronous, 동기적인  
 `Non-Blocking` : asynchronous, 비동기적인  
 콜백을 던져주고 기다리지 않고 다음으로 넘어간다
 
-### Event-Driven
+### - Event-Driven
 
 콜백을 던져주고 나서 파일이 다 읽혀지는 이벤트가 발생하면 콜백호출 (이벤트를 통해 콜백 호출)
+
+## 노드의 동작방식 | 내부 구조 살펴보기
+
+node.js 소스코드를 동작하게 하면
+
+- node.js Application 형태로 동작
+- 어플리케이션 내부에는 `heap`, `call stack` 이 있다
+- 스택에서 setTimeout이 호출되었다면 non-blocking이므로 정해진 시간에 콜백을 수행해달라고 하고 스택에 있는 다음 함수로 넘어감
+- 정해진 시간이 되면 `task queue`라는 대기줄에 콜백함수를 넣어준다
+- `event loop`가 콜스택이 비어있을때까지 기다렸다가 콜스택이 비어있으면 task queue의 콜백함수를 콜스택으로 가져옴
+
+Node APIs (node.js runtime 환경은) multi Thread 이므로 알아서 병렬적으로 처리
+
+Node.js는 Main Single Thread에서 동작한다  
+우리의 어플리케이션과 전달하는 콜백함수의 코드는 가벼운 일들만 처리해야한다
+
+Don't block the event loop, keep it running and avoid anything  
+that could block the thread-like synchronous network calls or infinite loops
+
+- node.js는 I/O 관련된 일에는 👍 (because of non-blocking & event-driven)
+- But CPU에서는 node.js는 적합하지 않다 이미지나, 비디오 처리는 무거움  
+  (But! 12 이후 버전부터 `worker threads`라는 스레드를 만들 수 있는 API를 활용할 수 있다)
+
+## 노드 서버의 특징
+
+Traditional Server
+
+- cloud나 하나의 서버 또는 여러개의 서버를 두고 데이터를 공유하기도 함
+- 멀티스레드 환경이기 때문에 thread pool이 있다 - 한 서버에서 만들 수 있는 스레드의 갯수는 제한적
+- 요청마다 각각의 스레드를 할당함
+  - 한번에 처리할 수 있는 갯수 이상의 요청이 들어오면, 처리할 수 있는 스레드가 생길 때까지 기다렸다가 쓰레드 풀에서 대기하고 있는 스레드가 있으면 처리
+
+Node.js Server
+
+- 요청이 들어오면 하나의 스레드가 받은 다음 해야하는 일을 뒤에 있는 아이들에게 던짐
+- 하나의 스레드가 요청을 받아서 요청이 완료될 때까지 기다리는 게 아니라 필요한 일을 처리할 수 있는 데이터베이스나 네트워크에게 위임하면서 여러가지 요청을 빠르게 처리
