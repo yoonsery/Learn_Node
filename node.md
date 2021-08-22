@@ -120,3 +120,27 @@ Node.js Server
 
 - 요청이 들어오면 하나의 스레드가 받은 다음 해야하는 일을 뒤에 있는 아이들에게 던짐
 - 하나의 스레드가 요청을 받아서 요청이 완료될 때까지 기다리는 게 아니라 필요한 일을 처리할 수 있는 데이터베이스나 네트워크에게 위임하면서 여러가지 요청을 빠르게 처리
+
+## REPL
+
+Read Eval Print Loop  
+정보를 받아서 연산하고 프린트하고 이것을 반복
+
+터미널에서 `node` 입력하면 노트 실행된다  
+console.log, function, 변수 입력 등등 실행할 수 있음  
+나오려면 `Ctrl + c`
+
+## 노드파일로 실행해보기
+
+폴더 1-node/main.js 생성  
+`cd 1-node` 로 해당 폴더에 들어가서 node main.js 또는 node main 실행
+
+## 노드 모듈 챕터 소개
+
+[노드 공식사이트 API](https://nodejs.org/dist/latest-v14.x/docs/api/)  
+[노드 입문자를 위한 심플한 사이트](https://nodejs.dev/learn)
+
+## 글로벌 오브젝트
+
+브라우저에서는 window가 global객체  
+node.js에서는 global이 golbal 객체
