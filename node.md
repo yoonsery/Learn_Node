@@ -144,3 +144,22 @@ console.log, function, 변수 입력 등등 실행할 수 있음
 
 브라우저에서는 window가 global객체  
 node.js에서는 global이 golbal 객체
+
+## 콘솔 로그 활용 방법
+
+```js
+console.log('debugging..🐛'); // 개발에만 사용 배포 Nope
+console.clear();
+console.info('info'); // 정보
+console.warn('warn'); // 경보
+console.error('error'); // 에러, 사용자 or 시스템 에러
+
+console.assert(2 === 3, 'not same!'); // 첫번째 인자가 false 일때 2번째 인자를 출력
+console.table(obj);
+console.dir(obj, { depth: 2 }); // 2번째 인자 옵션을 줄 수 있다
+console.time('label'); // 성능확인에 유용
+console.timeEnd('label');
+console.count('label'); // 함수내에 작성해서 해당 함수가 몇번 호출 되었는지
+console.countReset('label');
+console.trace(); // 함수내에 작성해서 이 함수가 어디서 호출되었는지
+```
