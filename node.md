@@ -190,3 +190,20 @@ package.json 에서 "main" 다음 라인에 `"type": "module",`를 추가 해 �
 `counter.increase();`  
 `counter.getCount();`  
 이렇게 counter.으로 접근해서 사용 가능함
+
+## os(운영체제) 정보 & process(프로세스) 정보
+
+process.nestTick()
+
+```js
+setTimeout(() => {
+  console.log('setTimeout');
+}, 0);
+
+process.nextTick(() => {
+  console.log('nextTick');
+});
+```
+
+둘다 콜백함수를 task queue에 넣어주는데 nextTick은 우선순위를 무시하고  
+task queue의 제일 앞에 콜백함수를 넣어준다 그래서 실행하면 setTimeout의 콜백보다 먼저 실행된다
