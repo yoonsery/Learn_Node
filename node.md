@@ -255,3 +255,14 @@ API는 3가지 형태로 제공되는데
 3. `promises.rename().then().catch(err)` : 프로미스
 
 동기적으로 실행되는 renameSync는 왠만하면 사용하지마 🚫
+
+`const fs = require('fs').promises;`로 받아와서
+
+- fs.readFile()
+- fs.writeFile()
+- fs.appendFile()
+- fs.copyFile()
+- fs.mkdir()
+- fs.readdir()
+
+를 실행할 수 있다 자세한 건 [여기로 👀](https://github.com/yoonsery/study_node/blob/main/10-file/app2.js)
