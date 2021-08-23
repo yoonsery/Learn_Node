@@ -163,3 +163,9 @@ console.count('label'); // 함수내에 작성해서 해당 함수가 몇번 호
 console.countReset('label');
 console.trace(); // 함수내에 작성해서 이 함수가 어디서 호출되었는지
 ```
+
+## this | 브라우저와의 차이점
+
+- 함수내부에서는 global
+- 클래스에서는 클래스 자신
+- global scope에서는 module.exports
