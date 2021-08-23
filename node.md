@@ -220,3 +220,28 @@ setTimeout(() => {
 ```
 
 출력해보면 setTimeout을 0초로 설정해도 콜스택이 텅텅 빌 때까지 기다려야 하므로 시간이 걸린다
+
+## path
+
+node.js는 컴퓨터 위에서 동작하기 때문에 파일 시스템에 접근하기 편하다
+
+```js
+console.log(__dirname);
+console.log(__filename);
+
+console.log(path.sep);
+console.log(path.delimiter);
+
+path.basename(__filename); //   print file.text
+path.basename(__filename, '.js'); //   print extension only (like .txt)
+
+path.dirname(__filename);
+path.extname(__filename); //  print extension only
+path.parse(__filename); //    전체 경로를 분리해서 obj형태로 출력
+path.format(parsed); //  obj를 기존의 string 형태로 출력
+
+path.isAbsolute(__dirname); //    절대경로인지 t/f로 판별
+path.isAbsolute('../');
+path.normalize('ridiculus///path');
+path.join(__dirname, 'image'); // make new 'image' directory
+```
