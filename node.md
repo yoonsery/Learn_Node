@@ -172,5 +172,21 @@ console.trace(); // 함수내에 작성해서 이 함수가 어디서 호출되�
 
 ## module ( export, require )
 
+#### node에서 module 사용
+
 node 시스템에서 자체적으로 만든 exports, require 기능  
 2015년 JS es6 버전이후부터는 자바스크립트 언어 자체에서 모듈 지원함
+
+#### JavaScript module 사용
+
+터미널에서 해당 폴더에 들어가서 `npm init --yes` 실행 후  
+package.json 에서 "main" 다음 라인에 `"type": "module",`를 추가 해 준다  
+그리고 counter.js에 돌아와서 내보내고 싶은 함수 앞에 `export` 작성  
+사용하는 파일에서는 require를 사용하지 않고 `import { 함수명, 함수명2 } from '경로/파일.확장자'` 작성해준다
+
+만약 모듈에서 함수들을 일일이 import 해오기 싫다면  
+`import * as counter from './counter.js';`  
+이렇게 counter.js에 있는 모든 함수들을 `counter`라는 이름 아래에 하나의 오브젝트로 묶어서 가져올 수 있다  
+`counter.increase();`  
+`counter.getCount();`  
+이렇게 counter.으로 접근해서 사용 가능함
