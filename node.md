@@ -245,3 +245,13 @@ path.isAbsolute('../');
 path.normalize('ridiculus///path');
 path.join(__dirname, 'image'); // make new 'image' directory
 ```
+
+## file
+
+API는 3가지 형태로 제공되는데
+
+1. `rename(...., callback(err, data))` : 비동기로 실행되거나
+2. `renameSync(...)` : 동기적으로 실행, 콜백함수 전달 안함, 에러나면 끝
+3. `promises.rename().then().catch(err)` : 프로미스
+
+동기적으로 실행되는 renameSync는 왠만하면 사용하지마 🚫
