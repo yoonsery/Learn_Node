@@ -169,3 +169,8 @@ console.trace(); // 함수내에 작성해서 이 함수가 어디서 호출되�
 - 함수내부에서는 global
 - 클래스에서는 클래스 자신
 - global scope에서는 module.exports
+
+## module ( export, require )
+
+node 시스템에서 자체적으로 만든 exports, require 기능  
+2015년 JS es6 버전이후부터는 자바스크립트 언어 자체에서 모듈 지원함
