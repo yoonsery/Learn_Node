@@ -207,3 +207,16 @@ process.nextTick(() => {
 
 둘다 콜백함수를 task queue에 넣어주는데 nextTick은 우선순위를 무시하고  
 task queue의 제일 앞에 콜백함수를 넣어준다 그래서 실행하면 setTimeout의 콜백보다 먼저 실행된다
+
+## timer와 call stack
+
+```js
+console.log('code1');
+console.time('timeout 0');
+setTimeout(() => {
+  console.timeEnd('timeout 0');
+  console.log('setTimeout 0');
+}, 0);
+```
+
+출력해보면 setTimeout을 0초로 설정해도 콜스택이 텅텅 빌 때까지 기다려야 하므로 시간이 걸린다
