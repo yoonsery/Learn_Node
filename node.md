@@ -319,3 +319,7 @@ const emitter = new EventEmitter();
   - emitter에 원하는 갯수만큼 콜백함수 등록할 수 있다
 - `emitter.removeListener('이벤트명', callback)` 해당 이벤트와 해당하는 콜백을 중지
 - `emitter.removeAllListener()` 모든 이벤트에 등록된 콜백함수를 제거
+
+🚨 `EventEmitter`는 한번 객체를 만들면 그 객체내에서 발생하는 이벤트에 한해서 들을 수 있다  
+여러가지 EventEmitter 객체를 만들면 다른 emitter에서 발생하는 이벤트는 다른 emitter에서 들을 수 없다  
+그래서 exports할 때 Class로 만들어서 다른곳에서도 사용할 수 있게 만듦
