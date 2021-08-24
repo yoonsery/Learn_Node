@@ -288,3 +288,13 @@ API는 3가지 형태로 제공되는데
 Fixed-size chunk of memory | array of integers, byte of data
 
 [여기서 👀](https://github.com/yoonsery/study_node/blob/main/11-buffer/app.js)
+
+## Stream
+
+`fs.createReadStream('경로', { 옵션 })`  
+createReadStream은 두번째 인자로 `highWaterMark`, `encoding` 등을 받을 수 있다  
+highWaterMark는 stream이 한번에 처리할 수 있는 buffer size를 결정한다  
+명시하지 않을 경우 기본적으로 64 kbytes가 설정되어 있다
+
+createReadStream의 API인 `on` 이나 `once`는 this를 리턴하므로  
+chaining을 할 수 있다
