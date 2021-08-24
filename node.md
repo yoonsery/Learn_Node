@@ -291,7 +291,7 @@ Fixed-size chunk of memory | array of integers, byte of data
 
 ## Stream
 
-**read**
+**read**  
 `fs.createReadStream('경로', { 옵션 })`  
 createReadStream은 두번째 인자로 `highWaterMark`, `encoding` 등을 받을 수 있다  
 highWaterMark는 stream이 한번에 처리할 수 있는 buffer size를 결정한다  
@@ -300,9 +300,22 @@ highWaterMark는 stream이 한번에 처리할 수 있는 buffer size를 결정�
 createReadStream의 API인 `on` 이나 `once`는 this를 리턴하므로  
 chaining을 할 수 있다
 
-**write**
+**write**  
 만약 `fs.createWriteStream('경로');`에 on으로 API 추가해서 finish 되었을 때 이벤트를 처리하는 콜백을 사용하려면  
 `.end();` 으로 finish 되었다고 명시해줘야 한다  
 `.write('text');` 으로 text를 파일에 쓸 수 있다
 
 **pipe**
+
+## Event
+
+```js
+const EventEmitter = require('events');
+const emitter = new EventEmitter();
+```
+
+- `emitter.on('이벤트명', callback)` 으로 임의로 이벤트를 만들고 콜백으로 어떤 일을 수행시킬 수 있다
+- `emitter.emit('이벤트명', ...args)` 로 이벤트를 발생시키고, 전달하고자하는 데이터를(args, 객체나 배열도 가능) 연결해줄 수 있다
+  - emitter에 원하는 갯수만큼 콜백함수 등록할 수 있다
+- `emitter.removeListener('이벤트명', callback)` 해당 이벤트와 해당하는 콜백을 중지
+- `emitter.removeAllListener()` 모든 이벤트에 등록된 콜백함수를 제거
