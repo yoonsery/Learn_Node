@@ -263,7 +263,7 @@ API는 3가지 형태로 제공되는데
 - fs.mkdir()
 - fs.readdir()
 
-를 실행할 수 있다 자세한 건 [여기로 👀](https://github.com/yoonsery/study_node/blob/main/1-module/10-file/app2.js)
+를 실행할 수 있다 자세한 건 [여기로 👀](https://github.com/yoonsery/study_node/blob/main/1-node/10-file/app2.js)
 
 ## Buffer & Stream
 
@@ -285,7 +285,7 @@ API는 3가지 형태로 제공되는데
 
 Fixed-size chunk of memory | array of integers, byte of data
 
-[여기서 👀](https://github.com/yoonsery/study_node/blob/main/1-module/11-buffer/app.js)
+[여기서 👀](https://github.com/yoonsery/study_node/blob/main/1-node/11-buffer/app.js)
 
 ## Stream
 
