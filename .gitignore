@@ -5,3 +5,5 @@
 12-stream/*.txt
 
 *.zip
+
+node_modules/
