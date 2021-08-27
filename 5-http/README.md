@@ -64,3 +64,44 @@ Hypermedia Transfer Protocol **Secure**
   - `500` : internal server error
   - `502` : bad gateway
   - `503` : service unavailable
+
+## Request Method
+
+#### URL : Uniform Resource Locator
+
+서버에 요청할 때 어떤 리소스를 원하는지, URL을 사용해서 특정한 리소스의 경로에 대해서 나타내야 한다  
+리소스가 어디에 있는지 고유한 값을 나타내는 주소 같은 것  
+URL은 다양한 프로토콜에서 사용할 수 있다
+
+- `https` : protocol (어떤 프로토콜인지)
+- `www.server.com` : hostname (어떤 서버에 접속하는지 명시)
+- `:443 port` : 주로 생략, 그 서버에 있는 어떤 어플리케이션에, 어떤 포트에 접속 할건지
+- `/index.html` : path 어떤 경로에 접속할 건지
+
+예) `https://www.server.com/courses/backend/search?q=coding` 이라면,  
+protocol + hostname + pathname + query (`?q=coding`이 해당)
+
+`URL`은 클라이언트가 서버 특정한 위치에 있는 리소스에 접근하기 위해서, `서버에 있는 무엇을 원하는지`를 나타낸다  
+이 때 함께 사용하는 `Request Methods`는 그 리소스를 이용해서, `어떤 액션을 원하는지` 명시한다
+
+#### [Request Methods의 종류](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods)
+
+- **GET** : get
+- **POST** : create
+- **PUT** : replace (idempotent: yes)
+- **DELETE** : delete
+- **PATCH** : replace partially (idempotent: no)
+- **HEAD** : get without body
+- **OPTIONS** : all supported methods for URL
+- **TRACE** : echoes the received request
+
+`POST` : 201 (created), 401,3,4,9 로 응답할 수 있다 항상 200일 필요 없다, 상황에 맞게 적절한 status code를 보내면 된다  
+`PUT | DELETE | PATCH` : 200, 204(no content), 403,4,5  
+`HEAD | OPTIONS | TRACE` : 200, 401,3,4,5
+
+- 서버에 있는 리소스를 읽기만 하는 요청 (서버에 있는 데이터를 변경하지 않음) : **GET | HEAD | OPTIONS | TRACE**
+- 서버에 있는 데이터를 변경하는 요청 : **POST | PUT | DELETE | PATCH**
+
+각 메소드마다 `safe`, `idempotent`, `cacheable` 을 눈여겨 보기  
+`Idempotent` : 동일한 요청을 여러번 했을 때 (몇 번 했냐에 상관없이) 항상 서버를 동일한 상태로 유지할 수 있는지를 나타냄  
+멱등성\_ 동일한 요청을 한 번 보내는 것과 여러 번 연속으로 보내는 것이 같은 효과를 지니고, 서버의 상태도 동일하게 남을 때 해당 HTTP가 멱등성을 가졌다고 한다
