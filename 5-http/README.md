@@ -35,3 +35,32 @@ Hypermedia Transfer Protocol **Secure**
   - 성공 | 실패 여부를 나타내는 status 코드를 함께 묶어서 보낸다
   - HTTP v2에서는 HTML뿐만아니라 관련된 여러가지 파일들(css, js...)을 동시에 보낼 수 있다
 - 서버에서 응답을 보내고 더이상 보낼 데이터가 없다면, TCP connection이 닫혀서 종료가 된다
+
+### [Status Codes](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status)
+
+처리된 결과의 정보를 내포하고 있다
+
+- **`1xx` : informational**
+  - `100` : continue
+  - `102` : processing
+- **`2xx` : successful**
+  - `200` : OK
+  - `201` : created
+  - `204` : no content
+- **`3xx` : redirection**
+  - `301` : moved permanently
+  - `302` : found
+  - `303` : see other (get 요청에서만 응답)
+  - `307` : temporary redirect (same methods)
+  - `308` : permanent redirect (same methods)
+- **`4xx` : client error**
+  - `400` : bad request
+  - `401` : unauthorized
+  - `403` : forbidden (admin)
+  - `404` : not found
+  - `405` : method not allowed
+  - `409` : conflict
+- **`5xx` : server error**
+  - `500` : internal server error
+  - `502` : bad gateway
+  - `503` : service unavailable
