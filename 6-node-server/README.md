@@ -86,3 +86,39 @@ const server = http.createServer((req, res) => {
 
 ⚠️ 문제점  
 html 파일만 제공하는 서버로, 브라우저 클라이언트 외에 다른 클라이언트는 사용할 수 없다
+
+## JSON 보내주기
+
+```js
+const server = http.createServer((req, res) => {
+  const url = req.url; //  what?
+  const method = req.method; //  how?, action?
+  if (url === '/kitchen') {
+    if (method === 'GET') {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(foods));
+    } else if (method === 'POST') {
+      const body = [];
+      req.on('data', (chunk) => {
+        console.log(chunk);
+        body.push(chunk);
+      });
+      req.on('end', () => {
+        const bodyStr = Buffer.concat(body).toString();
+        const food = JSON.parse(bodyStr);
+        foods.push(food);
+        console.log(food);
+        res.writeHead(201);
+        res.end();
+      });
+    }
+  }
+});
+```
+
+POST확인은 포스트맨에서 새로운 요청을 만들어서  
+`POST` 동작선택 후, `URL 주소`를 넣어주고 (http://localhost:8080/kitchen)  
+`Body` 탭에 `raw`선택 후 type을 `JSON`으로 선택한다  
+본문에 `{ "naem": "tea" }` 로(쌍따옴표를 사용해야한다) 작성하고 `send`클릭  
+그럼 아랫부분에 status code로 201을 받았다고 뜨는 걸 확인할 수 있다  
+메모리에 추가가 되었기 때문에 브라우저 새로고침으로 확인하거나 포스트맨에서 `GET` 동작 선택 후 send키로 확인 가능하다
