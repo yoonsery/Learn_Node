@@ -90,3 +90,29 @@ res.json(); // json데이터를 사용자에게 보낼 수 있다
 res.redirect();
 res.send();
 ```
+
+```js
+app.get('/', (req, res, next) => {
+  console.log('get');
+  res.send('hi'); // 항상 클라이언트에게 데이터를 보내줘야 함 otherwise 로딩스피너 계속 돌아가~
+});
+```
+
+## Request
+
+```js
+app.get('/sky/:id', (req, res, next) => {
+  // console.log(req.path);
+  // console.log(req.headers);
+
+  //  localhost:8080/sky/ona/ 에서 리프레시하면
+  console.log(req.params); //      { id: 'ona' }
+  console.log(req.params.id); //    ona
+
+  // localhost:8080/sky/ona/?keyword=handball 에 가서 리프레시 하면
+  console.log(req.query); //         { keyword: 'handball' }
+  console.log(req.query.keyword); //   handball
+
+  res.send('hi');
+});
+```
