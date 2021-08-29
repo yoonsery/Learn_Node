@@ -56,3 +56,37 @@ app.get('/posts', function (req, res next) {
   - ③ 에서는 리퀘스트가 들어온 GET 메소드와 경로가 동일하기 때문에 여기서 해당하는 리소스를 준비해서 사용자에게 response해준다 `res.send()`
   - ✨ 이렇게 response에 한번 반응을 하면, 그 뒤에있는 미들웨어에게는 넘어가지 않는다
   - 앞에 있던 모든 미들웨어에 해당이 안되면 제일 마지막에 등록된 미들웨어가 호출되고 마지막 미들웨어에서 에러를 던지거나 response를 응답한다
+
+## 서버 만들기
+
+`npm init --yes`, `npm i express`  
+`package.json`에서 `"start": "nodemon app"`, `"type": "module"` 추가  
+`npm i nodemon --save-dev`로 개발자 모드에서 노드몬이 필요하다는 걸 명시해준다 - 다른 개발자와 프로젝트를 공유했을 때 nodemon이 없을 경우를 대비해서
+
+IP - 서버가 네트워크상에 어디있는지 알 수 있다  
+Port - 그 서버의 어떤 어플리케이션에 접속하길 원하는지 나타냄
+
+[공식사이트](https://expressjs.com/en/4x/api.html)
+
+```js
+app.all(); //  모든 메소드 처리
+
+app.disable(); // 어플에서 설정을 끄고, 켤 때 사용
+app.enable();
+
+// Request
+req.baseUrl;
+req.body;
+req.cookies;
+req.ip;
+req.method;
+req.params;
+req.query;
+
+// Response
+res.append(); // header에 data 추가
+res.cookie(); // 쿠키설정
+res.json(); // json데이터를 사용자에게 보낼 수 있다
+res.redirect();
+res.send();
+```
