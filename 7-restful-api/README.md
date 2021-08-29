@@ -68,3 +68,10 @@ Create - POST | Read - GET | Update - PUT | Delete - DELETE
 - `GET` /posts/~~create~~Post ❌, ⟶ `POST` /posts ⭕️
 - `GET` /posts/1/tags : what이 명확하지 않다, tag를 가지고 오고 싶다면 ⟶ `GET` /tags/?postId=1
 - API는 `무엇`을 원하는지 제일 관심있는 도메인을 먼저 적은 다음에 http request method를 이용해서 어떤 액션을 하고 싶은지 나타낼 수 있다
+
+## Rest APIs 사례
+
+- YouTube API, - 일반적인 API형태
+  - (서버에서 연관된 데이터들을 그룹짓는) 도메인 별로 정리되어 있다 - [👀](https://developers.google.com/youtube/v3/docs/videos/list)
+- Github - 진정한 Rest API의 사례
+  - 역시 도메인별로 나눠져 있다, 요청한 도메인에 관련된 모든 정보들의 링크를 response에 포함해서 보내줌 - [👀](https://developer.github.com/v3/)
