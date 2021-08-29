@@ -116,3 +116,15 @@ app.get('/sky/:id', (req, res, next) => {
   res.send('hi');
 });
 ```
+
+## Response
+
+```js
+app.get('/sky/:id', (req, res, next) => {
+  res.setHeader('key', 'value'); // header에 특정한 것을 설정해야 할 때 사용, key-value 형태로 전달
+
+  res.json({ name: 'bolbol' }); // object도 전달이 된다
+  res.sendStatus(400); // data 없이 status code만 보낼 수 있다 >> Bad Request 가 뜸
+  res.status(201).send('created'); // 개별적으로 status code를 보내고 메시지를 보내줄 수도 있다
+});
+```
