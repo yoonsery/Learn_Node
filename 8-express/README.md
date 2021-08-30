@@ -331,3 +331,39 @@ app.get('/file1', (req, res) => {
   });
 });
 ```
+
+#### error handling in Promise
+
+```js
+// 비동기적인 Promise일 경우에는 catch로 에러를 처리하면 된다 (promise - then().catch())
+app.get('/file2', (req, res) => {
+  fsAsync
+    .readFile('/file2.txt') //
+    .catch((error) => {
+      res.sendStatus(404);
+    });
+});
+
+// 또는 next로 에러전달 ⟶ 다음 미들웨어로 에러를 던졌기 때문에 마지막 안전망인 에러처리 미들웨어에서 에러를 잡음
+app.get('/file2', (req, res, next) => {
+  fsAsync
+    .readFile('/file2.txt') //
+    .catch(next);
+  // .catch((error) => next(error)); ⬆️ 전달받은 인자 = 호출하는 인자 : 생략가능
+});
+```
+
+#### error handling in Async
+
+```js
+// async 미들웨어는 프로미스를 호출하므로 에러발생시, 마지막 안전망인 에러처리 미들웨어에는 포착되지 않음
+// 하지만  await 코드 자체는 동기적이므로, try 와 catch 로 에러를 처리해줘야 한다
+
+app.get('/file3', async (req, res) => {
+  try {
+    const data = await fsAsync.readFile('/file2.txt');
+  } catch {
+    res.sendStatus(404);
+  }
+});
+```
