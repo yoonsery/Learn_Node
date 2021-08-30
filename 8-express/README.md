@@ -270,3 +270,64 @@ app.post('/', (req, res, next) => {
 });
 app.listen(8080);
 ```
+
+## Error handling
+
+- 클라이언트가 요청한 request를 제대로 처리하지 못했다면, 클라이언트에게 적절한 에러메시지를 보내서 에러에 대한 충분한 내용을 전달해야함
+- 시스템 내부적으로 큰 문제가 발생하더라도 서버가 죽지 않도록, 문제상황에서 빠르게 복귀될 수 있도록 예외처리를 잘 할 것
+
+각각의 미들웨어에서 처리할 수 있는 에러는 가능한 한 많이 잘 해둬야한다 그래야 상황에 맞는 적절한 에러메시지를 클라이언트에게 보낼 수 있다
+
+#### 1. 동기적인 함수에서 에러가 발생할 때
+
+```js
+app.get('/file1', (req, res) => {
+  const data = fs.readFileSync('/file1.txt'); // ① file1.txt가 없기때문에 에러발생 & readFileSync는 동기처리되므로 바로 에러던짐
+});
+
+// code ..
+// code ..
+
+// ①에서 던져진 에러는 에러처리하는 미들웨어인 이곳으로 와서 처리됨, ①의 상황에 맞는 구체적인 에러메시지가 아닌 일반적인 에러메시지를 보냄
+app.use((error, req, res, next) => {
+  console.error(error);
+  res.status(500).json({ message: 'Something went wrong' });
+});
+```
+
+그래서 `동기적인 함수`를 호출하는 경우에는 `try, catch`로 감싸준다
+
+```js
+app.get('/file1', (req, res) => {
+  try {
+    const data = fs.readFileSync('/file1.txt');
+  } catch (error) {
+    res.status(404).send('File not found');
+  }
+});
+```
+
+#### 2. 비동기적인 함수에서 에러가 발생한 경우는?
+
+```js
+app.get('/file1', (req, res) => {
+  fs.readFile('/file1.txt', (err, data) => {}); // readFile은 비동기적
+});
+// 로딩스피너가 계속 돌고, 마지막 일반적 에러처리를 해주는 미들웨어에 도달하지 못함
+```
+
+`fs.readFile` 함수호출 자체만으로는 에러가 발생하지 않았고 `콜백함수의 첫번째 인자`로 `에러가 전달`되었기 때문에  
+비동기적인 함수는 마지막 안전망인 에러처리 미들웨어에 잡히지 않는다 ❗️ ( 내부로 에러가 전달되었기 때문에 외부에서 포착되지 않음)  
+express의 모든 미들웨어의 체인은 동기적으로 연결되어있다 그래서 비동기적인 에러는 잡을 수 없다
+
+그래서 `비동기함수`에서는 아래와 같이 `콜백함수 내에서 에러를 처리`해줘야 한다
+
+```js
+app.get('/file1', (req, res) => {
+  fs.readFile('/file1.txt', (err, data) => {
+    if (err) {
+      res.status(404).send('File not found');
+    }
+  });
+});
+```
