@@ -254,3 +254,19 @@ app.get('/', (req, res, next) => {
   res.send('Bye');
 });
 ```
+
+## Post
+
+포스트맨에 POST, body, raw, json 선택하고 내용을 넣고 send 하면 콘솔에 undefined가 뜬다  
+`app.use(express.json())` 사용하면 콘솔에 undefined가 아닌 포스트맨으로 POST한 내용이 뜬다
+
+```js
+import express from 'express';
+const app = express();
+
+app.use(express.json()); // 요청이 들어오는 body 부분을 자동으로 parsing해서 보여준다
+app.post('/', (req, res, next) => {
+  console.log(req.body);
+});
+app.listen(8080);
+```
