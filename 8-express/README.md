@@ -384,3 +384,139 @@ async middleware는 자동으로 프로미스를 리턴한다
 따로 라이브러리 설치없이 프로미스에서 리턴해주거나, async를 사용하면 마지막 에러처리 미들웨어에서 에러를 잡아준다  
 [github express issue comment](https://github.com/expressjs/express/issues/2259#issuecomment-433586394)  
 [Async Middleware](https://github.com/blakeembrey/async-middleware)
+
+## Router
+
+반복되는 코드를 어떻게 해야할까?
+
+```js
+// app.js
+
+import express from 'express';
+
+const app = express();
+
+app.use(express.json());
+
+app.get('/posts', (req, res) => {
+  res.status(201).send('GET: /posts');
+});
+
+app.post('/posts', (req, res) => {
+  res.status(201).send('POST: /posts');
+});
+
+app.put('/posts/:id', (req, res) => {
+  res.status(201).send('PUT: /posts');
+});
+
+app.delete('/posts/:id', (req, res) => {
+  res.status(201).send('DELETE: /posts');
+});
+
+app.listen(8080);
+```
+
+경로가 같으면 이렇게 route로 체이닝을 해줄 수 있다
+
+```js
+// app.js
+
+app
+  .route('/posts')
+  .get((req, res, next) => {
+    res.status(201).send('GET: /posts');
+  })
+  .post((req, res) => {
+    res.status(201).send('POST: /posts');
+  });
+
+app
+  .route('posts/:id')
+  .put((req, res) => {
+    res.status(201).send('PUT: /posts/:id');
+  })
+  .delete((req, res) => {
+    res.status(201).send('DELETE: /posts/:id');
+  });
+```
+
+하지만! 복잡한 서버일 경우, 여러가지 경로가 존재하므로 이렇게 `app.js`에서 전부 나열하는 것은
+
+- 가독성이 떨어진다
+- module성이 떨어진다
+- 유지보수가 어렵다
+
+`app.js`에 아래처럼 코드 작성하고
+
+```js
+// app.js
+
+app.use('/posts', postRouter);
+app.use('/users', userRouter);
+
+// app.use()에서 경로를 지정해뒀기 때문에
+// post.js, user.js에서 경로 일일이 작성하지 않고 '/' 현재경로를 사용하면 된다
+```
+
+router 폴더에 `post.js`, `user.js`를 만든다
+
+```js
+// post.js
+
+import express from 'express';
+
+const router = express.Router();
+
+router.get('/', (req, res) => {
+  res.status(201).send('GET: /posts');
+});
+
+router.post('/', (req, res) => {
+  res.status(201).send('POST: /posts');
+});
+
+router.put('/:id', (req, res) => {
+  res.status(201).send('PUT: /posts/:id');
+});
+
+router.delete('/:id', (req, res) => {
+  res.status(201).send('DELETE: /posts/:id');
+});
+
+export default router;
+
+/* ------------------------------------------------- */
+
+// user.js
+
+import express from 'express';
+
+const router = express.Router();
+
+router.get('/', (req, res) => {
+  res.status(201).send('GET: /posts');
+});
+
+export default router;
+```
+
+이렇게 만들어 두고 `app.js`에 import를 해온다. `app.js`에서는 큰 그림을 볼 수 있고  
+`router` 안에서 필요한 것들을 처리해줘서 깔끔✨
+
+```js
+// app.js
+
+import express from 'express';
+import postRouter from './router/post.js';
+import userRouter from './router/user.js';
+
+const app = express();
+
+app.use(express.json());
+
+app.use('/posts', postRouter);
+app.use('/users', userRouter);
+
+app.listen(8080);
+```
