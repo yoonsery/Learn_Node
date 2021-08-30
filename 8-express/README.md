@@ -520,3 +520,39 @@ app.use('/users', userRouter);
 
 app.listen(8080);
 ```
+
+## useful internal middlewares
+
+```js
+// 1.
+app.use(express.json()); // REST API ⟶ Parse body
+
+// 2.
+app.use(express.urlencoded({ extended: false })); // HTML Form ⟶ Body
+
+// 3. 서버에 있는 static한 리소스를 받을 때 사용, 해당경로의 폴더에 있는 리소스를 사용자가 읽어갈 수 있게 한다
+
+// 브라우저에서 localhost:8080/image.jpg, localhost:8080/index.html 로 접속하여
+// public폴더 안의 모든 리소스에 접근할 수 있다
+
+// 3-1. public 폴더가 동일한 경로에 있을 때
+app.use(express.static('public'));
+
+// 3-2. 만약 public 폴더가 app.js보다 하위에 있는 폴더라면?
+const __dirname = new URL('.', import.meta.url).pathname; // ES module에서 __dirname을 사용하기 위한 코드
+app.use(express.static(__dirname + 'public')); // 경로지정을 이렇게 해줘야 한다
+
+// 3-3. option을 줘서 header에 추가적인 데이터를 전달할 수 있다
+const options = {
+  dotfiles: 'ignore', // 숨겨진 파일은 안보이게
+  etag: false,
+  index: false,
+  maxAge: '1d', // 얼마나 오랫동안 캐시가 가능한지
+  redirect: false,
+  setHeaders: function (res, path, stat) {
+    res.set('x-timestamp', Date.now()); // header에 데이터 추가
+  },
+};
+
+app.use(express.static(__dirname + 'public', options));
+```
