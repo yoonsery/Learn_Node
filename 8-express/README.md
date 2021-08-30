@@ -271,7 +271,7 @@ app.post('/', (req, res, next) => {
 app.listen(8080);
 ```
 
-## Error handling
+## Error handling [👀](https://github.com/yoonsery/study_node/blob/main/8-express/4-error-handling/app.js)
 
 - 클라이언트가 요청한 request를 제대로 처리하지 못했다면, 클라이언트에게 적절한 에러메시지를 보내서 에러에 대한 충분한 내용을 전달해야함
 - 시스템 내부적으로 큰 문제가 발생하더라도 서버가 죽지 않도록, 문제상황에서 빠르게 복귀될 수 있도록 예외처리를 잘 할 것
@@ -367,3 +367,20 @@ app.get('/file3', async (req, res) => {
   }
 });
 ```
+
+## 비동기 에러 처리하는 방법 - express5 최신버전 [👀](https://github.com/yoonsery/study_node/blob/main/8-express/5-express5/app.js)
+
+catch를 하지않아도 비동기적 코드가 마지막 안전망 에러 미들웨어에 잡힐 수 있는 방법
+
+#### Express5 이전버전
+
+`npm i express-async-errors` 라이브러리를 설치하면 promise도 마지막 안전망인 에러처리 미들웨어에서 잡을 수 있다  
+`import {} from 'express-async-errors';`로 import 한다  
+단, 미들웨어에서 프로미스를 리턴하는 경우에만! `return fsAsync.readFile('/file.txt')` 이렇게 리턴을 해줘야 한다  
+async middleware는 자동으로 프로미스를 리턴한다
+
+#### Express5 이후 버전
+
+따로 라이브러리 설치없이 프로미스에서 리턴해주거나, async를 사용하면 마지막 에러처리 미들웨어에서 에러를 잡아준다  
+[github express issue comment](https://github.com/expressjs/express/issues/2259#issuecomment-433586394)  
+[Async Middleware](https://github.com/blakeembrey/async-middleware)
