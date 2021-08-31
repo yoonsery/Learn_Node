@@ -556,3 +556,73 @@ const options = {
 
 app.use(express.static(__dirname + 'public', options));
 ```
+
+## CORS [👀](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)
+
+`app.js`에서 express로 8080포트로 연결하고 `index.html`에서는 라이브서버로 실행한다 (5500포트로 연결됨)
+
+```html
+<!-- index.html -->
+<script>
+  fetch('http://localhost:8080/', { method: 'GET' })
+    .then(console.log)
+    .catch(console.error);
+</script>
+```
+
+라이브서버 콘솔에서 Access to fetch has been blocked by CORS policy:  
+No 'Access-Control-Allow-Origin' header is present on the requested resource.  
+If an opaque response serves your needs, set the request's mode to 'no-cors'  
+to fetch the resource with CORS disabled.  
+라고 경고알림이 뜬다
+
+### CORS policy
+
+`CORS`, Cross-origin Resource Sharing
+
+클라이언트와 서버가 동일한 IP주소 (= 동일한 서버)에서 동작하고 있다면 별다른 제약없이 리소스를 주고 받으며 공유할 수 있다  
+만약 클라이언트가 서버와 다른 IP에 있다면 원칙적으로는 그 어떤 데이터도 주고 받을 수 없다  
+=> 데이터를 주고 받으려면?
+
+서버에서 클라이언트에게 반응을 보낼 때 `Access-Control-Allow-Origin`을 header에 추가해주면 클라이언트에서 데이터를 볼 수 있다  
+`setHeader`를 통해 `Access-Control-Allow-Origin`를 header에 전달하고 어떤 메소드들을 보여줄 수 있는지 설정할 수 있다
+
+```js
+// app.js
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', 'http://127.0.0.1:5500');
+  res.setHeader(
+    'Access-Control-Allow-Methods',
+    'OPTIONS, GET, POST, PUT, DELETE'
+  );
+  next();
+});
+```
+
+그런데 이렇게 일일히 작성하지 않아도 되는 미들웨어가 있다! `npm i cors`설치  
+import하고 `app.use`로 등록만 하면된다
+
+```js
+import cors from 'cors';
+
+app.use(cors());
+// Access-Control-Allow-Origin: *
+// 어떤 도메인에서 요청이 와도 서버의 응답을 다 표기할 수 있다는 뜻이므로
+// 우리가 배포한 클라이언트에서만 데이터를 보여줄 수 있도록 설정하는 게 좋다
+
+app.use(
+  cors({
+    origin: ['http://127.0.0.1:5500'], //   여기서만 cors policy 허용
+  })
+);
+
+// 그 외에 다른 옵션들도 추가할 수 있다
+app.use(
+  cors({
+    origin: ['http://127.0.0.1:5500'],
+    optionsSuccessStatus: 200, // 200으로 자동으로 응답
+    credentials: true, // header에 토큰이나 사용자의 정보 추가하기를 허용
+    // Access-Control-Allow-Credentials: true, 와 동일한 코드
+  })
+);
+```
