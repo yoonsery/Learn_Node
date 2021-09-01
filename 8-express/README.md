@@ -626,3 +626,57 @@ app.use(
   })
 );
 ```
+
+## useful external middlewares
+
+`npm i cookie-parser morgan helmet` 설치
+
+`body`를 보려면 `app.use(express.json())`을 등록해야한다
+
+```js
+app.use(express.json()); // 이렇게 express.json을 미들웨어에 등록해야 req.body의 내용을 볼 수 있다
+
+app.get('/', (req, res) => {
+  console.log(req.body); // express.json()을 하지 않으면 undefined
+  res.send('Welcome!!');
+});
+```
+
+#### cookie-parser [👀](http://expressjs.com/en/resources/middleware/cookie-parser.html)
+
+마찬가지로 cookieParser를 미들웨어에 등록하지않고 `req.cookies`을 콘솔에 출력하면 undefined가 나온다
+
+```js
+import cookieParser from 'cookie-parser';
+
+app.use(cookieParser());
+
+app.get('/', (req, res) => {
+  console.log(req.cookies); // it will be undefined without cookie-parser
+  //                           콘솔: { yummy_cookie: 'choco', tasty_cookie: 'banana' }
+  console.log(req.cookies.yummy_cookie); // choco 가 뜬다
+  res.send('Welcome!');
+});
+```
+
+포스트맨에서 `Headers` 탭에 가서 `KEY`에 Cookie, `VALUE`에 yummy_cookie=choco; tasty_cookie=banana라고 적고  
+send를 클릭하면 콘솔에 VALUE로 지정한 값이 출력된다
+
+#### [morgan](https://github.com/expressjs/morgan) [👀](http://expressjs.com/en/resources/middleware/morgan.html)
+
+사용자에게 요청을 받을 때마다 어떤 요청을 받았는지, 얼마나 걸렸는지 등의 정보를 로그로 남겨준다
+
+```js
+import morgan from 'morgan';
+app.use(morgan('combined')); // 어떤 포맷으로 로그를 남길 건지 설정 _ 디폴트는 combined, 이 외에 common, tiny...사이트에서 옵션 확인해봐~
+```
+
+#### helmet [👀](https://github.com/helmetjs/helmet)
+
+공통적으로 보안에 필요한 header를 추가해준다
+
+```js
+import helmet from 'helmet';
+
+app.use(helmet());
+```
