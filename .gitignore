@@ -1,11 +1,16 @@
-*.pdf
+node_modules/
 
 .history/
+.vscode/
+
+*.json
+*.pdf
+*.zip
 
 12-stream/*.txt
 
-*.zip
 
-node_modules/
 
-*.json
+
+
+
