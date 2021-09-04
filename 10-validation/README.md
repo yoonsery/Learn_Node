@@ -119,3 +119,19 @@ app.get(
   }
 );
 ```
+
+## Sanitization
+
+공백, 대소문자로 인해 에러가 날 수 있다  
+공백은 `trim()`으로 normalization을 해주고, email은 `normalizeEmail()`로 처리, 그 외에도 여러가지 있으니 사이트에서 확인~
+
+```js
+app.post(
+  '/users',
+  [
+    body('name').trim().isLength({ min: 2 }).withMessage('more than 2 for name'),
+    body('email').isEmail().withMessage('enter an email').normalizeEmail(),
+    validate,
+  ],
+  (req, res, next) => {
+```

@@ -15,9 +15,12 @@ const validate = (req, res, next) => {
 app.post(
   '/users',
   [
-    body('name').isLength({ min: 2 }).withMessage('more than 2 for name'),
+    body('name')
+      .trim()
+      .isLength({ min: 2 })
+      .withMessage('more than 2 for name'),
     body('age').isInt().withMessage('please enter a number'),
-    body('email').isEmail().withMessage('enter an email'),
+    body('email').isEmail().withMessage('enter an email').normalizeEmail(),
     body('job.name').notEmpty(),
     validate,
   ],
