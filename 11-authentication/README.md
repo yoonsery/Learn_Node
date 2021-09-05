@@ -68,3 +68,32 @@ secret을 통해서 인코딩을 하므로 정보의 유효성을 확인할 수 
 - JWT의 단점
   - { JWT } : JWT 자체가 단점이 될 수 있다
   - 만약 만료기간이 없는 JWT를 주고 받는다면 - 해커가 JWT를 가져가서 악용할 수 있다
+
+## bcrypt
+
+password-hashing function 패스워드 암호화 알고리즘
+
+어떤 알고리즘을 썼는지 알고리즘에 대한 정보 `Alg` - 얼마나 많은 복잡도로 암호화 했는지 암호화에 대한 비용 `Cost` -  
+더 랜덤한 것들을 이용해 원하는 길이만큼 암호를 복잡하게 하는 `Salt` - 암호화된 정보 `Hash` 로 구성되어 있다
+
+암호를 hashing만 할 수 있고, hashing 된 결과를 다시 패스워드로 만들 수는 없다 (예\_계란 -> 오믈렛)  
+암호화할 때 랜덤한 문자열을 이용해서 (Salt) 암호화를 좀 더 복잡하게 만들 수 있다
+
+`npm view bcrypt` 치면 [깃헙링크](https://github.com/kelektiv/node.bcrypt.js#readme) 볼 수 있다
+`npm i bcrypt`로 설치
+
+```js
+// 예시는 동기적인 방식인 Sync를 사용하지만 서버에서 구현할 때는 비동기적인 방식으로 하자!
+const bcrypt = require('bcrypt');
+
+const password = 'abcd1234';
+const hashed = bcrypt.hashSync(password, 10); // 길이가 10개인 salt 설정
+console.log(`password: ${password}, hashed: ${hashed}`);
+
+const result = bcrypt.compareSync('abcd1234', hashed);
+console.log(result); // true
+```
+
+salt의 복잡도가 높아질수록 해시하는데 걸리는 시간이 기하급수적으로 늘어난다  
+암호계산은 CPU를 사용하는 것이므로 salt를 지나치게 길게 할 필요없다, 대부분 8, 10 ~ 12로 한다  
+[- salt 길이별 성능 측정](https://auth0.com/blog/hashing-in-action-understanding-bcrypt/)
