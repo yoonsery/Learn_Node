@@ -135,3 +135,11 @@ app.post(
   ],
   (req, res, next) => {
 ```
+
+- server에서 유효성검사를 하는 이유는,
+
+  - 데이터 베이스에서 읽고 쓰기 전에 데이터가 유효한지 검사해서 시간과 비용을 절약할 수 있다
+  - (데이터 베이스가 다른 서버나 클라우드에 있다면 네트워크 비용이 발생하므로)
+  - sanitization, normalization을 하면서 데이터를 일관성 있게 보관하기 위해서
+
+좀 더 공부하고 싶다면 - Contract Testing: Client ⇌ Server, Proto-base...
