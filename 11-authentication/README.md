@@ -69,6 +69,65 @@ secret을 통해서 인코딩을 하므로 정보의 유효성을 확인할 수 
   - { JWT } : JWT 자체가 단점이 될 수 있다
   - 만약 만료기간이 없는 JWT를 주고 받는다면 - 해커가 JWT를 가져가서 악용할 수 있다
 
+## JWT 사용하기 [👀](https://jwt.io/)
+
+`npm i jsonwebtoken` 설치
+
+```js
+const token = jwt.sign(
+  //1. payload에는 필수적인 내용들만 담는다
+  {
+    id: 'userId',
+    isAdmin: true, // isAdmin_사용자의 역할에 대해 전달
+  },
+  // 2. secret key 는 대개 32 character (32byte), pw generator로 임의로 생성..
+  '3H5anIHK]%0}3ixU7)s1n$(05jJk)GT5'
+);
+
+console.log(token); // 이 값을 복사한 후 공식사이트에_👀 가면 token해독이 가능함
+```
+
+decoded 된 내용을 볼 수는 있지만 만약 값을 변경하면 토큰이 변경되고 서버에서 사용자가 토큰을 수정했는지 알 수 있다
+
+```js
+// 사이트에서 decoded 된 값을 수정하면 encoded 되었던 토큰이 변경됨 -> 그 값을 edited에 변수로 지정
+const edited =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Im9uYSIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE2MzA5MDgwNzF9.cTntKlgSCegyI_z9guTjg2R3FnYy7HFf-l7pog81r1o';
+
+jwt.verify(edited, secret, (error, decoded) => {
+  console.log(error, decoded);
+}); // JsonWebTokenError : invalid signature 라고 에러뜬다
+
+// 변경되지 않은 원래 토큰을 verify하고 decoded를 콘솔로그하면 payload 값을 출력함
+const originalKey =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Im9uYSIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE2MzA5MDgwNzF9.9i7SE2uxmsOQLnm35QNJgVJL5JEpFu5d6u3J6LhsbpU';
+
+jwt.verify(originalKey, secret, (error, decoded) => {
+  console.log(decoded);
+});
+```
+
+#### 만료기능 추가
+
+```js
+const token = jwt.sign(
+  {
+    id: 'ona',
+    isAdmin: false,
+  },
+  secret,
+  { expiresIn: 2 } // 2초안에 만료
+);
+
+// setTimeout으로 3초 뒤에 검증하면 이미 유효기간이 만료되었으므로 에러가 발생함
+// TokenExpiredError: jwt expired
+setTimeout(() => {
+  jwt.verify(token, secret, (error, decoded) => {
+    console.log(error, decoded);
+  });
+}, 3000);
+```
+
 ## bcrypt
 
 password-hashing function 패스워드 암호화 알고리즘
