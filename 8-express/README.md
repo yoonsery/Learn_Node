@@ -537,8 +537,12 @@ app.use(express.urlencoded({ extended: false })); // HTML Form ⟶ Body
 
 // 3-1. public 폴더가 동일한 경로에 있을 때
 app.use(express.static('public'));
+app.use(express.static('public', options)); //  option이 있는 경우
 
-// 3-2. 만약 public 폴더가 app.js보다 하위에 있는 폴더라면?
+// 3-2. 보통 node 앱을 실행할 때는 프로젝트 상위 루트 경로에서 실행하므로 아래와 같이 설정해서 쓴다
+app.use(express.static('.', options));
+
+// * 만약 public 폴더가 app.js보다 하위에 있는 폴더라면?
 const __dirname = new URL('.', import.meta.url).pathname; // ES module에서 __dirname을 사용하기 위한 코드
 app.use(express.static(__dirname + 'public')); // 경로지정을 이렇게 해줘야 한다
 
