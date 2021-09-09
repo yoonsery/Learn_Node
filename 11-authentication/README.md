@@ -156,3 +156,11 @@ console.log(result); // true
 salt의 복잡도가 높아질수록 해시하는데 걸리는 시간이 기하급수적으로 늘어난다  
 암호계산은 CPU를 사용하는 것이므로 salt를 지나치게 길게 할 필요없다, 대부분 8, 10 ~ 12로 한다  
 [- salt 길이별 성능 측정](https://auth0.com/blog/hashing-in-action-understanding-bcrypt/)
+
+---
+
+클론코딩 프로젝트에서는 JWT를 사용해보자
+
+- RESTful API Service as a backend
+- Usable by other services (micro-services)
+- Easy to scale horizontally (multiple instancess)
