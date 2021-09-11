@@ -80,7 +80,7 @@ ADD CONSTRAINT `id`
 🔧 모양을 클릭하면 데이터타입을 변경할 수 있다 (apply 잊지마~)  
 테이블 모양을 클릭하면 실제 데이터를 볼 수 있고 `SELECT * FROM dwitter.tweets;`이 적힌 창에서 SQL을 써서 직접 query도 연습해볼 수 있다
 
-#### node 서버에서 연결하기
+### node 서버에서 연결하기
 
 `npm i mysql2` 설치 후 db라는 폴더를 만든 후 > `database.js` 만든다
 
@@ -123,3 +123,69 @@ export const config = {
 import { db } from './db/database.js';
 db.getConnection().then(console.log); // PromisePoolConnection 의 관련된 내용들이 콘솔에 나온다
 ```
+
+### 서버 data > `auth.js` 에서 MySQL 사용하기
+
+1. createUser에 MySQL 적용하기
+
+```js
+import { db } from '../db/database.js';
+
+export async function createUser(user) {
+  const { username, password, name, email, url } = user;
+  return db
+    .execute(
+      'INSERT INTO users (username, password, name, email, url) VALUES (?,?,?,?,?)',
+      // 앞에 명시한 params의 갯수만큼 ?를 입력한다
+      // database에서 자동으로 증가하는 id를 만드므로 따로 id 명시 안함
+      [username, password, name, email, url]
+    )
+    .then((result) => {
+      console.log(result);
+      return result;
+    });
+}
+```
+
+npm start 후 포스트맨에서 signup을 해보면 console.log(result); 의 결과가 아래와 같이 출력된다
+
+```shell
+  ResultSetHeader {
+    fieldCount: 0,
+    affectedRows: 1,
+    insertId: 6,
+    info: '',
+    serverStatus: 2,
+    warningStatus: 0
+  },
+```
+
+.then()에 콘솔로그 대신 아래처럼 코드를 넣어준다
+
+```js
+.then((result) => result[0].insertId);
+```
+
+MySQL Workbench에 가서 users 테이블을 확인하면 user가 추가되어 있는 것을 볼 수 있다
+
+2. findByUsername 에 MySQL 적용하기
+
+```js
+export async function findByUsername(username) {
+  return db
+    .execute('SELECT * FROM users WHERE username=?', [username])
+    .then((result) => result[0][0]); // 로그로 result값을 확인해보면 이중배열의 첫번째 값을 가져와야함
+}
+```
+
+3. findById 에 MySQL 적용하기
+
+```js
+export async function findById(id) {
+  return db
+    .execute('SELECT * FROM users WHERE id=?', [id])
+    .then((result) => result[0][0]);
+}
+```
+
+데이터베이스를 이용하도록 수정하는데 data > auth.js 파일 하나만 수정하면 되었다!
