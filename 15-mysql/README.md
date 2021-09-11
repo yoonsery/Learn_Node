@@ -79,3 +79,47 @@ ADD CONSTRAINT `id`
 맨 왼쪽 schemas에서 table의 ▶️ 을 선택하면 tweets, users가 만들어진 것을 확인할 수 있다  
 🔧 모양을 클릭하면 데이터타입을 변경할 수 있다 (apply 잊지마~)  
 테이블 모양을 클릭하면 실제 데이터를 볼 수 있고 `SELECT * FROM dwitter.tweets;`이 적힌 창에서 SQL을 써서 직접 query도 연습해볼 수 있다
+
+#### node 서버에서 연결하기
+
+`npm i mysql2` 설치 후 db라는 폴더를 만든 후 > `database.js` 만든다
+
+```js
+// database.js
+
+import mysql from 'mysql2';
+import { config } from '../config.js';
+
+const pool = mysql.createPool({
+  host: config.db.host,
+  user: config.db.user,
+  database: config.db.database,
+  password: config.db.password,
+});
+
+export const db = pool.promise();
+```
+
+`config.js`와, `.env`에서 관련된 값을 작성하고
+
+```js
+// config.js
+
+export const config = {
+  db: {
+    host: required('DB_HOST'), //          localhost
+    user: required('DB_USER'), //          root
+    database: required('DB_DATABASE'), //  dwitter
+    password: required('DB_PASSWORD'), //  🙊
+  },
+};
+```
+
+`app.js`에서 db를 불러와서 `getConnection()`으로 불러온다
+
+```js
+// app.js
+
+import { db } from './db/database.js';
+db.getConnection().then(console.log); // PromisePoolConnection 의 관련된 내용들이 콘솔에 나온다
+```
