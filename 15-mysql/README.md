@@ -1,4 +1,4 @@
-## MySQL
+## MySQL [👀](https://dev.mysql.com/doc/refman/8.0/en/)
 
 Community Downloads > MySQL Community Server, MySQL Workbench 다운로드
 
@@ -189,3 +189,83 @@ export async function findById(id) {
 ```
 
 데이터베이스를 이용하도록 수정하는데 data > auth.js 파일 하나만 수정하면 되었다!
+
+### 서버 data > `tweet.js` 에서 MySQL 사용하기 | join query
+
+```js
+export async function getAll() {
+  return db
+    .execute(
+      'SELECT tw.id, tw.text, tw.createdAt, tw.userId, us.username, us.name, us.url FROM tweets as tw JOIN users as us ON tw.userId=us.id ORDER BY tw.createdAt DESC'
+    )
+    .then((result) => result[0]);
+
+  // 'SELECT / FROM - JOIN / ON / ORDER BY DESC'
+  // =>  createdAt을 기준으로 역순으로 정렬
+
+  // MySQL사용 전 코드 ↓
+  // return Promise.all(
+  //   tweets.map(async (tweet) => {
+  //     const { username, name, url } = await userRepository.findById(
+  //       tweet.userId
+  //     );
+  //     return { ...tweet, username, name, url };
+  //   })
+  // );
+}
+```
+
+반복해서 사용되는 값을 변수로 할당해서 쓰면 간편!
+
+```js
+import { db } from '../db/database.js';
+
+const SELECT_JOIN =
+  'SELECT tw.id, tw.text, tw.createdAt, tw.userId, us.username, us.name, us.url FROM tweets as tw JOIN users as us ON tw.userId=us.id ';
+
+const ORDER_DESC = 'ORDER BY tw.createdAt DESC';
+
+export async function getAll() {
+  return db
+    .execute(`${SELECT_JOIN} ${ORDER_DESC}`) //
+    .then((result) => result[0]);
+}
+
+export async function getAllByUsername(username) {
+  return db
+    .execute(`${SELECT_JOIN} WHERE username=? ${ORDER_DESC}`, [username])
+    .then((result) => result[0]);
+}
+
+export async function getById(id) {
+  return db
+    .execute(`${SELECT_JOIN} WHERE tw.id=?`, [id])
+    .then((result) => result[0][0]);
+}
+
+export async function create(text, userId) {
+  return db
+    .execute('INSERT INTO tweets (text, createdAt, userId) VALUES(?,?,?)', [
+      text,
+      new Date(),
+      userId,
+    ])
+    .then((result) => getById(result[0].insertId));
+}
+
+export async function update(id, text) {
+  return db
+    .execute('UPDATE tweets SET text=? WHERE id=?', [text, id])
+    .then(() => getById(id));
+}
+
+export async function remove(id) {
+  return db.execute('DELETE FROM tweets WHERE id=?', [id]);
+}
+```
+
+테이블을 묶을 때 `FROM - JOIN` 사용, `ON`을 이용해 어떤 것이 똑같을 때 묶을건지 정해줬다  
+function getById(id)에서 `WHERE tw.id=?`과 function getAllByUsername(username)에서 `WHERE username=?`처럼  
+테이블 이름을 명시하는 것은 생략이 가능하고, 두개의 테이블에 동일한 이름이 있을때 충돌을 피하기 위해 테이블명을 명시해준다
+
+오타같은 실수가 있으면 컴파일 때 문제가 발생하는게 아니라 실시간으로 문제가 발생한다 -> 이것을 피할 수 있게 도와주는게 ORM
