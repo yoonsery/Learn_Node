@@ -34,3 +34,76 @@ sequelize.sync().then((client) => {
   initSocket(server);
 });
 ```
+
+### Sequelize auth.js에 적용하기
+
+```js
+import SQ from 'sequelize';
+import { sequelize } from '../db/database.js';
+
+const DataTypes = SQ.DataTypes;
+
+const User = sequelize.define(
+  'user',
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      allowNull: false,
+      primaryKey: true,
+    },
+    username: {
+      type: DataTypes.STRING(45),
+      allowNull: false,
+    },
+    password: {
+      type: DataTypes.STRING(128),
+      allowNull: false,
+    },
+    name: {
+      type: DataTypes.STRING(128),
+      allowNull: false,
+    },
+    email: {
+      type: DataTypes.STRING(128),
+      allowNull: false,
+    },
+    url: DataTypes.TEXT,
+  },
+  { timestamps: false }
+);
+```
+
+실행하면 아래의 값이 콘솔에 출력된다
+
+```shell
+Executing (default): CREATE TABLE IF NOT EXISTS `users` (`id` INTEGER NOT NULL auto_increment , `username` VARCHAR(45) NOT NULL, `password` VARCHAR(128) NOT NULL, `name` VARCHAR(128) NOT NULL, `email` VARCHAR(128) NOT NULL, `url` TEXT, `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB;
+Executing (default): SHOW INDEX FROM `users`
+```
+
+워크벤치에서 테이블 우클릭 refresh all을 클릭하면 users 테이블이 만들어진 걸 확인할 수 있다  
+내가 설정하지 않은 createdAt, updatedAt도 만들어져있는데 이러한 time stamp가 필요없다면  
+2번째 인자로 옵션 `{ timestamps: false }`을 주면 된다  
+workbench에서 테이블을 drop후 다시 refresh해서 확인해보면 timestamps 는 테이블에 포함되지 않은걸 확인할 수 있다
+
+sequelize.define()으로 User를 받아온 코드로 작성을 해보면 ↓
+
+```js
+// auth.js
+
+export async function findByUsername(username) {
+  return User.findOne({ where: { username } });
+}
+
+export async function findById(id) {
+  return User.findByPk(id);
+}
+
+export async function createUser(user) {
+  return User.create(user).then((data) => data.dataValues.id);
+  // return User.create(user).then((data) => {
+  //   console.log(data);  // 데이터를 출력해보면 필요한 값인 id 가 data.dataValues.id 인 것 알 수 있다
+  //   return data;
+  // });
+}
+```
