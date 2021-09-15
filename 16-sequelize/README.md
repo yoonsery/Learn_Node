@@ -107,3 +107,35 @@ export async function createUser(user) {
   // });
 }
 ```
+
+### Sequelize tweet.js에 적용하기
+
+auth.js에서 User를 export 해주고
+
+```js
+import SQ from 'sequelize';
+import { sequelize } from '../db/database.js';
+import { User } from './auth.js';
+
+const Tweet = sequelize.define('tweet', {
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    allowNull: false,
+    primaryKey: true,
+  },
+  text: {
+    type: DataTypes.TEXT,
+    allowNull: false,
+  },
+});
+
+Tweet.belongsTo(User);
+```
+
+workbench 에서 refresh하면 tweets 테이블이 만들어진 거 확인할 수 있다  
+createdAt, Foreign keys가 만들어진 것도 확인할 수 있다
+
+```js
+
+```
