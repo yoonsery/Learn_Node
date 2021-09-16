@@ -113,6 +113,8 @@ export async function createUser(user) {
 auth.js에서 User를 export 해주고
 
 ```js
+// tweet.js
+
 import SQ from 'sequelize';
 import { sequelize } from '../db/database.js';
 import { User } from './auth.js';
@@ -136,6 +138,177 @@ Tweet.belongsTo(User);
 workbench 에서 refresh하면 tweets 테이블이 만들어진 거 확인할 수 있다  
 createdAt, Foreign keys가 만들어진 것도 확인할 수 있다
 
-```js
+getAll(), create() 함수는 아래처럼 받아오고 data로 어떤 값이 출력되는지 확인해본다  
+create가 먼저 구현되어 있어야 getAll을 할 수 있으므로..
 
+```js
+export async function getAll() {
+  return Tweet.findAll().then((data) => {
+    console.log(data);
+    return data;
+  });
+}
+
+export async function create(text, userId) {
+  return Tweet.create(text, userId).then((data) => {
+    console.log(data);
+    return data;
+  });
+}
+```
+
+포스트맨에서 로그인 후 받은 토큰값으로 create, getAll을 해보고 어떤 값을 받아오는지 확인
+=> 트윗만 가져오고 사용자와 연결해서 찾으려면 다른 옵션을 줘야한다
+
+```js
+const Sequelize = SQ.Sequelize;
+
+export async function getAll() {
+  return Tweet.findAll({
+    attributes: [
+      'id',
+      'text',
+      'createdAt',
+      'userId',
+      [Sequelize.col('user.name'), 'name'], // 💡 User의 중첩된 값을 플랫하게 가져옴
+      [Sequelize.col('user.username'), 'username'],
+      [Sequelize.col('user.url'), 'url'],
+    ],
+    include: {
+      model: User,
+      attributes: [],
+    },
+    order: [['createdAt', 'DESC']], // 최근에 만들어진 순서대로
+  }).then((data) => {
+    console.log(data);
+    return data;
+  });
+}
+```
+
+getAllByUsername()에서도 옵션을 줘야하므로 반복되는 옵션값을 변수에 따로 저장해둔다
+
+```js
+const INCLUDE_USER = {
+  attributes: [
+    'id',
+    'text',
+    'createdAt',
+    'userId',
+    [Sequelize.col('user.name'), 'name'],
+    [Sequelize.col('user.username'), 'username'],
+    [Sequelize.col('user.url'), 'url'],
+  ],
+  include: {
+    model: User,
+    attributes: [],
+  },
+};
+
+const ORDER_DESC = { order: [['createdAt', 'DESC']] };
+```
+
+전체적으로 코드를 수정한 내용은?
+
+```js
+// tweet.js
+
+import SQ from 'sequelize';
+import { sequelize } from '../db/database.js';
+import { User } from './auth.js';
+
+const DataTypes = SQ.DataTypes;
+const Sequelize = SQ.Sequelize;
+
+const Tweet = sequelize.define('tweet', {
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    allowNull: false,
+    primaryKey: true,
+  },
+  text: {
+    type: DataTypes.TEXT,
+    allowNull: false,
+  },
+});
+
+Tweet.belongsTo(User);
+
+const INCLUDE_USER = {
+  attributes: [
+    'id',
+    'text',
+    'createdAt',
+    'userId',
+    [Sequelize.col('user.name'), 'name'],
+    [Sequelize.col('user.username'), 'username'],
+    [Sequelize.col('user.url'), 'url'],
+  ],
+  include: {
+    model: User,
+    attributes: [],
+  },
+};
+
+const ORDER_DESC = { order: [['createdAt', 'DESC']] };
+
+export async function getAll() {
+  return Tweet.findAll({ ...INCLUDE_USER, ...ORDER_DESC });
+}
+
+export async function getAllByUsername(username) {
+  return Tweet.findAll({
+    ...INCLUDE_USER,
+    ...ORDER_DESC,
+    include: {
+      ...INCLUDE_USER.include,
+      where: { username },
+    },
+  });
+}
+
+export async function getById(id) {
+  return Tweet.findOne({
+    where: { id },
+    ...INCLUDE_USER,
+  });
+}
+
+export async function create(text, userId) {
+  return Tweet.create({ text, userId }) //
+    .then((data) => {
+      getById(data.dataValues.id);
+    });
+}
+
+export async function update(id, text) {
+  return Tweet.findByPk(id, INCLUDE_USER) //
+    .then((tweet) => {
+      tweet.text = text;
+      return tweet.save();
+    });
+}
+
+export async function remove(id) {
+  return Tweet.findByPk(id) //
+    .then((tweet) => {
+      tweet.destroy();
+    });
+}
+```
+
+database.js에서도 mysql사용하지 않고 코드를 정리해준다 ( sequelize가 알아서 import해온다 )
+
+```js
+// database.js
+import { config } from '../config.js';
+import SQ from 'sequelize';
+
+const { host, user, database, password } = config.db;
+export const sequelize = new SQ.Sequelize(database, user, password, {
+  host,
+  dialect: 'mysql',
+  logging: false, // database 실행에 대한 로그가 콘솔에 남지 않게 하는 옵션, 배포시에 이렇게 끌 수 있다
+});
 ```
