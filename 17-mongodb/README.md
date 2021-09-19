@@ -1,4 +1,4 @@
-## mongoDB (3.6.6 version)
+## mongoDB
 
 The most commonly used NoSQL DB in Web Dav
 
@@ -24,4 +24,32 @@ mySQL, Sequelize 설치전 단계로 가서 `config.js`에서 `export const conf
   },
 ```
 
-`.env`에 가서 `DB_HOST=복사해온 코드`를 입력해준다
+`.env`에 가서 `DB_HOST=복사해온 코드`를 입력해준다 (`<password>`란에 내 패스워드 입력해준다)
+
+database와 app에 mongodb를 연결한다
+
+```js
+// database.js
+
+import MongoDb from 'mongodb';
+import { config } from '../config.js';
+
+export async function connectDB() {
+  return MongoDb.MongoClient.connect(config.db.host) //
+    .then((client) => client.db());
+}
+```
+
+```js
+// app.js
+
+import { connectDB } from './database/database.js';
+
+connectDB()
+  .then((db) => {
+    console.log('init', db);
+    const server = app.listen(config.host.port);
+    initSocket(server);
+  })
+  .catch(console.error);
+```
