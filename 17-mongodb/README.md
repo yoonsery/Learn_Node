@@ -137,3 +137,91 @@ NoSQL의 포인트 정리
   (정보를 중복으로 가지고 있는게 관계를 가지는 것보다 성능, 확장성이 더 낫기때문)
 
 #### tweet 에서 MongoDB 사용하기
+
+```js
+//  tweet.js
+
+export async function create(text, userId) {
+  const { name, username, url } = await userRepository.findById(userId);
+  const tweet = {
+    text,
+    createdAt: new Date(),
+    userId,
+    name,
+    username,
+    url,
+  };
+  return getTweets()
+    .insertOne(tweet)
+    .then((data) => {
+      console.log(data);
+      // return data;      // insertedId 가 출력되는 걸 확인할 수 있다
+      // return { ...tweet, _id: data.insertedId };
+      return mapOptionalTweet({ ...tweet, _id: data.insertedId }); // id가 자동으로 추가될 수 있게 함수를 만들어 전달한다
+    });
+}
+```
+
+전체적으로 수정된 코드는 아래와 같다
+
+```js
+import MongoDb from 'mongodb';
+import { getTweets } from '../database/database.js';
+import * as userRepository from './auth.js';
+
+export async function getAll() {
+  return getTweets().find().sort({ createdAt: -1 }).toArray().then(mapTweets);
+}
+
+export async function getAllByUsername(username) {
+  return getTweets()
+    .find({ username })
+    .sort({ createdAt: -1 })
+    .toArray()
+    .then(mapTweets);
+}
+
+export async function getById(id) {
+  return getTweets()
+    .findOne({ _id: new MongoDb.ObjectId(id) })
+    .then(mapOptionalTweet);
+}
+
+export async function create(text, userId) {
+  const { name, username, url } = await userRepository.findById(userId);
+  const tweet = {
+    text,
+    createdAt: new Date(),
+    userId,
+    name,
+    username,
+    url,
+  };
+  return getTweets()
+    .insertOne(tweet)
+    .then((data) => mapOptionalTweet({ ...tweet, _id: data.insertedId }));
+}
+
+export async function update(id, text) {
+  return getTweets()
+    .findOneAndUpdate(
+      { _id: new MongoDb.ObjectId(id) },
+      { $set: { text } },
+      { returnDocument: 'after' } // 수정이 된 이후의 객체를 리턴해준다
+    )
+    .then((result) => result.value)
+    .then(mapOptionalTweet);
+}
+
+export async function remove(id) {
+  return getTweets().deleteOne({ _id: new MongoDb.ObjectId(id) });
+}
+
+function mapOptionalTweet(tweet) {
+  return tweet ? { ...tweet, id: tweet._id.toString() } : tweet;
+}
+
+function mapTweets(tweets) {
+  return tweets.map(mapOptionalTweet);
+}
+```
