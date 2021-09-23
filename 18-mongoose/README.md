@@ -1,5 +1,7 @@
 ## Mongoose 사용하기
 
+ORM - Object Relational Mapping
+
 #### auth에서 Mongoose사용하기
 
 `npm i mongoose` 설치 `database.js`에서 MongoDb 대신 mongoose를 import한다
@@ -142,3 +144,6 @@ export async function remove(id) {
   return Tweet.findOneAndDelete(id);
 }
 ```
+
+mongoDB는 schema 자체가 없기 때문에 어떤 데이터를 저장하든지 상관하지 않으므로 데이터의 일관성이 깨질 수 있다  
+mongoose는 코드상에서 schema를 작성하여 데이터의 일관성을 지킬 수 있다
