@@ -61,3 +61,46 @@ List
   - HTTP v2, free
   - Heroku는 백엔드 배포에 많이 사용되지만 아직 HTTP v1만 지원한다
   - mongoDB는 Atlas에 이미 배포를 한 상태라 배포를 따로 하지 않아도 된다
+
+### 배포 전 최종 코드 점검 (main branch로 돌아와서)
+
+platform 호스팅에서는 port라는 단어를 사용하므로 `configure.js`에서 변경해준다
+
+```js
+ host: {
+    port: parseInt(required('HOST_PORT', 8080)),
+  },
+// 가 아니라 아래처럼 변경! 하고 cors도 추가해준다
+
+port: parseInt(required('PORT', 8080)),
+cors: {
+  allowedOrigin: required('CORS_ALLOW_ORIGIN'),
+},
+```
+
+app.js 에서 코드 추가, 수정
+
+```js
+// app.js
+
+// 추가
+const corsOption = {
+  origin: config.cors.allowedOrigin,
+  optionsSuccessStatus: 200,
+};
+
+// 수정
+app.use(cors(corsOption)); // cors 인자로 corsOption 추가
+
+sequelize.sync().then(() => {
+  const server = app.listen(config.port); // port로 수정한 값
+  initSocket(server);
+});
+```
+
+#### 버그수정 & clean up
+
+middleware의 auth.js에서 `req.token = token;`를 전달해줘야 한다  
+app.js에서 `console.log('Server is started...🏃🏻‍♀️ ${new Date()}');`를 추가해서 나중에 서버의 로그를 확인할 때 서버가 언제 시작, 재시작되었는지 알 수 있다  
+(실제 코드에선 '' 대신 백틱사용~)  
+socket.js에서 `origin: '*'` 대신 `origin: config.cors.allowedOrigin,`으로 변경한다
