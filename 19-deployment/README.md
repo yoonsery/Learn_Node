@@ -104,3 +104,53 @@ middleware의 auth.js에서 `req.token = token;`를 전달해줘야 한다
 app.js에서 `console.log('Server is started...🏃🏻‍♀️ ${new Date()}');`를 추가해서 나중에 서버의 로그를 확인할 때 서버가 언제 시작, 재시작되었는지 알 수 있다  
 (실제 코드에선 '' 대신 백틱사용~)  
 socket.js에서 `origin: '*'` 대신 `origin: config.cors.allowedOrigin,`으로 변경한다
+
+### 백엔드 배포하기 (heroku)
+
+가입 후 `create new app`클릭 ⟶ app name과 region선택 ⟶ heroku Git 배포 선택  
+heroku CLI 설치 ⟶ 터미널에서 `heroku login`으로 로그인  
+배포용 브랜치를 만든다 ⟶ heroku 리모트를 가리키도록 설정 `heroku git:remote -a <앱네임>-ac`  
+heroku는 mysql말고 postgres를 사용하므로 코드를 살짝 수정해준다 (결제카드를 등록하면 사용할 수 있다)  
+터미널에서 `heroku addons:create heroku-postgresql:hobby-dev` 입력 ⟶ 데이터베이스가 생성된다  
+터미널에서 `heroku config` 입력 ⟶ 자세한 정보가 출력되어 확인할 수 있다  
+👉🏻 `postgres://<username>:<password>@<host>:<port>/<database name>` : 환경변수 설정할 때 사용
+
+heroku 사이트의 대시보드에 가서 만들어놓은 프로젝트 선택 ⟶ settings ⟶ `Config Vars` 선택  
+필요한 값들을 추가하면 된다 (DB_HOST,DB_PORT, DB_USER, DB_PASSWORD, DB_DATABASE, DATABASE_URL,  
+JWT_SECRET, CORS_ALLOW_ORIGIN)
+
+postgres에 필요한 것들을 설치한다 (pg, pg-hstore) `npm i pg pg-hstore`  
+`config.js`에서 `db`에 `port: required('DB_PORT'),`를 추가한다  
+아래코드처럼 `database.js`에서도 코드를 수정해준다
+
+```js
+//  db > database.js
+
+const { host, port, user, database, password } = config.db; // port 추가
+export const sequelize = new SQ.Sequelize(database, user, password, {
+  host,
+  port, // port 추가
+  dialect: 'postgres', // mysql에서 postgres로 업데이트
+  logging: false,
+  dialectOptions: {
+    // postgres가 필요한 옵션 추가
+    ssl: {
+      require: true,
+      rejectUnauthorized: false,
+    },
+  },
+});
+```
+
+`package.json`에 scripts start가 `nodemon app`으로 되어 있는데 heroku가 실행할 수 있도록해줘야 한다  
+⟶ `node app`으로 변경해주거나, `Procfile`이란 파일을 만들어서 `web: node app.js`라고 코드를 써준다
+
+모든 변경사항을 확인 후 커밋을 해준다 ⟶ 커밋 후 터미널에 `git push heroku <브랜치명>:master` 를 입력해서 배포한다  
+`heroku logs`로 어떻게 동작하고 있는지 터미널에서 확인할 수 있다  
+heroku 사이트 settings에서 서버의 도메인 주소를 확인할 수 있다  
+config vars에서 CORS_ALLOW_ORIGIN의 value에 프론트엔드 배포한 주소를 넣어준다
+
+### 프론트엔드 배포하기 (netlify)
+
+`.env` 에서 `REACT_APP_BASE_URL=<서버주소>` 로 수정한다 (주소 마지막에 `/`는 제외)  
+터미널에서 `npm run build` 실행 -> `netlify deploy` 입력하고 차근차근 진행하면 된다
